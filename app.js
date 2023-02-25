@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 
 import { config } from "dotenv";
 
@@ -10,6 +11,8 @@ export const app = express();
 
 // add middlewire for body parser
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.get("/", (req, res, next) => {
   res.send("Its working");

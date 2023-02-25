@@ -1,6 +1,9 @@
 import { asyncError } from "../middlewares/error.js";
 import { User } from "../models/user.js";
 import ErrorHandler from "../utils/error.js";
+import { sendToken } from "../utils/features.js";
+
+//Login
 
 export const login = asyncError(async (req, res, next) => {
   const { email, password } = req.body;
@@ -12,25 +15,27 @@ export const login = asyncError(async (req, res, next) => {
   }
 
   // compare password now
-
   const isMatched = await user.comparePassword(password);
 
   if (!isMatched) {
-    return next(new ErrorHandler("Incorrect Password", 400));
+    return next(new ErrorHandler("Incorrect email or Password", 400));
   }
-  res.status(200).json({
-    message: true,
-    message: `Welcome Back, ${user.name}`,
-  });
+
+  sendToken(user, res, `Welcome Back, ${user.name}`, 200);
 });
+
+//Sign Up
 
 export const signUp = asyncError(async (req, res, next) => {
   const { name, email, password, address, city, country, pinCode, role } =
     req.body;
 
+  let user = await User.findOne({ email });
+  if (user) return next(new ErrorHandler("User Already Exist", 400));
+
   //Add cloudinary webkit-hyphenate-character:
 
-  await User.create({
+  user = await User.create({
     name,
     email,
     password,
@@ -41,8 +46,21 @@ export const signUp = asyncError(async (req, res, next) => {
     role,
   });
 
-  res.status(201).json({
+  sendToken(user, res, `Registered Successfully`, 201);
+});
+
+export const logOut = asyncError(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+  res.status(200).json({
     success: true,
-    message: "Register successfully",
+    user,
+  });
+});
+
+export const getProfile = asyncError(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+  res.status(200).json({
+    success: true,
+    user,
   });
 });
