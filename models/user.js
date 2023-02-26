@@ -23,7 +23,7 @@ const schema = new mongoose.Schema({
   country: { type: String, required: true },
   pinCode: { type: Number, required: true },
   role: { type: String, enum: ["admin", "user"], default: "user" }, //There will be tow optoion by default will be user
-  Avatar: {
+  avatar: {
     public_id: String,
     url: String,
   },
