@@ -7,6 +7,10 @@ export const errorMiddleware = (err, req, res, next) => {
       (err.statusCode = 400);
   }
 
+  if (err.name === "CastError") {
+    (err.message = `invalid ${err.path}`), (err.statusCode = 400);
+  }
+
   res.status(err.statusCode).json({ success: false, message: err.message });
 };
 

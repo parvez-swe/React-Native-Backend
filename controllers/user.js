@@ -1,7 +1,12 @@
 import { asyncError } from "../middlewares/error.js";
 import { User } from "../models/user.js";
 import ErrorHandler from "../utils/error.js";
-import { cookieOptions, getDataUri, sendToken } from "../utils/features.js";
+import {
+  cookieOptions,
+  getDataUri,
+  sendEmail,
+  sendToken,
+} from "../utils/features.js";
 import cloudinary from "cloudinary";
 
 //Login
@@ -169,10 +174,20 @@ export const forgetPassword = asyncError(async (req, res, next) => {
   const otp_expire = 15 * 60 * 1000;
 
   user.otp = otp;
-  user.opt_expire = new Date(Date.now() + otp_expire);
+  user.otp_expire = new Date(Date.now() + otp_expire);
   await user.save();
 
+  console.log(otp);
   //send Email
+  const message = `Your OTP for Reseting password is ${otp}. \n Please ignore if you Haven't request this`;
+  try {
+    await sendEmail("OTP for reseting password", user.email, message);
+  } catch (error) {
+    user.otp = null;
+    user.otp_expire = null;
+    await user.save();
+    return next(error);
+  }
 
   res.status(200).json({
     success: true,
@@ -181,9 +196,22 @@ export const forgetPassword = asyncError(async (req, res, next) => {
 });
 
 export const resetPassword = asyncError(async (req, res, next) => {
-  const user = await User.findById(req.user._id);
+  const { otp, password } = req.body;
+
+  const user = await User.findOne({ otp, otp_expire: { $gt: Date.now() } });
+  if (!user)
+    return next(new ErrorHandler("Incorrect OTP or has been expired", 400));
+
+  if (!password)
+    return next(new ErrorHandler("Please Enter new Password", 400));
+  user.password = password;
+  user.otp = undefined;
+  user.otp_expire = undefined;
+
+  await user.save();
+
   res.status(200).json({
     success: true,
-    user,
+    message: "Password Change Successfully, You can login now",
   });
 });

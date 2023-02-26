@@ -18,13 +18,15 @@ app.get("/", (req, res, next) => {
   res.send("Its working");
 });
 
+import { errorMiddleware } from "./middlewares/error.js";
+
 //Import Router
 import user from "./routes/user.js";
-import ErrorHandler from "./utils/error.js";
-import { errorMiddleware } from "./middlewares/error.js";
+import product from "./routes/product.js";
 
 //Pre url
 app.use("/api/v1/user", user);
+app.use("/api/v1/product", product);
 
 //Error Middleware
 app.use(errorMiddleware);

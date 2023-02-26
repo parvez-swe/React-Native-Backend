@@ -28,7 +28,7 @@ const schema = new mongoose.Schema({
     url: String,
   },
   otp: Number,
-  opt_expire: Date,
+  otp_expire: Date,
 });
 
 //Hashing Password
