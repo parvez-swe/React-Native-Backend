@@ -18,6 +18,7 @@ const schema = new mongoose.Schema({
     required: [true, "Please Enter stock"],
   },
   images: [{ public_id: String, url: String }],
+
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
