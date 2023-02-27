@@ -19,6 +19,8 @@ import { singleUpload } from "../middlewares/multer.js";
 const router = express.Router();
 
 router.post("/new", isAuthenticated, isAdmin, singleUpload, createProduct);
+router.post("/payment", isAuthenticated, processPayment);
+
 router.get("/all", getAllProducts);
 router.get("/admin", isAuthenticated, isAdmin, getAdminProducts);
 
