@@ -1,7 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-
 import { config } from "dotenv";
+import cors from "cors";
 
 config({
   path: "./data/config.env",
@@ -11,8 +11,14 @@ export const app = express();
 
 // add middlewire for body parser
 app.use(express.json());
-
 app.use(cookieParser());
+app.use(
+  cors({
+    credentials: true,
+    methods: ["Get", "POST", "PUT", "DELETE"],
+    origin: [process.env.FRONTEND_URL_1, process.env.FRONTEND_URL_2],
+  })
+);
 
 app.get("/", (req, res, next) => {
   res.send("Its working");
